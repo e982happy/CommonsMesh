@@ -7,100 +7,86 @@
 
 ## Part A: Strategic Alignment with the Next Generation Internet Vision
 
-CommonsMesh is designed as a direct embodiment of the NGI vision: a **human-centric, open, trustworthy, and resilient internet** that empowers individuals and communities rather than surveilling and monetizing them. The European Commission's Next Generation Internet initiative calls for technology that reflects "openness, diversity and inclusion" and that "enables human potential, mobility and creativity at the largest possible scale."
+When I was doing architectural field research in the informal settlements of Port Moresby, Papua New Guinea, I saw firsthand how communities survive on the margins. They don't rely on state infrastructure; they rely on dense, informal networks of mutual aid. They share tools, labor, and information. But coordinating this sharing is incredibly difficult, especially when internet access is spotty and people are time-poor.
 
-CommonsMesh addresses this call in three concrete ways. First, it eliminates structural dependence on corporate platforms for community coordination. Today, the most vulnerable communities—those with the greatest need for mutual aid—are the most dependent on surveillance-based platforms like WhatsApp and Facebook Groups, which monetize their social graphs and expose them to algorithmic manipulation. CommonsMesh provides a genuine alternative: a **local-first, privacy-preserving coordination layer** where all data is stored on the user's own device and no central entity has access to the community graph.
+Currently, these communities are forced to use corporate platforms like WhatsApp or Facebook Groups to organize. This is a mismatch for two reasons. First, chat apps are designed for conversation, not coordination. Important needs get buried. Second, these platforms extract data and trap vulnerable populations in surveillance capitalism.
 
-Second, CommonsMesh advances the NGI goal of **P2P infrastructure as a public good**. By building on libp2p and contributing a well-documented, open protocol for structured community state synchronization, this project creates reusable building blocks for the decentralized internet. The protocol specifications, cryptographic event envelope design, and anti-Sybil mechanisms will be published as open standards that other projects can adopt.
+CommonsMesh is my attempt to build a technical alternative that aligns directly with the Next Generation Internet's vision of a human-centric, trustworthy web. It provides a local-first, privacy-preserving coordination layer. Because it's built on libp2p, it doesn't need a central server. The data stays on the users' devices.
 
-Third, CommonsMesh demonstrates a responsible and privacy-preserving application of **on-device AI**. Rather than sending community data to cloud AI services, the embedded LLM operates entirely locally. This is a concrete contribution to the NGI goal of "intelligent mediators" that serve users rather than extracting value from them.
+By moving away from a "social feed" model to a "structured community graph" model, CommonsMesh turns chaotic group chats into actionable mutual aid. And by embedding a lightweight LLM directly on the phone to help match needs and resources, it provides the benefits of AI without sending community data to a cloud provider. This is exactly the kind of open, decentralized public good that the NGI initiative aims to support.
 
 ---
 
 ## Part B: Detailed Technical Architecture
 
+I've spent the last five years writing highly optimized code for smart glasses—edge devices with severe constraints on battery, memory, and connectivity. I'm applying those exact same optimization techniques to CommonsMesh.
+
 ### B.1 Protocol Layer
 
-The protocol layer is the foundation of CommonsMesh. It defines the structure of all community state changes as **signed event envelopes**. Each event carries a cryptographic signature (Ed25519), a SHA-256 hash of its canonical JSON payload, and a `chain_hash` that links it to the previous event in the user's personal event log. This creates a tamper-evident, append-only log for every participant.
+The core of CommonsMesh isn't the UI; it's the protocol. I treat every community action as a cryptographically signed event envelope. 
 
-The event schema supports nine event types, each representing a distinct community action:
+When a user interacts with the app, they generate an event (like `graph.delta` to declare a need, or `project.motion` to propose a group action). This event is signed with an Ed25519 key generated on their device. I use canonical JSON serialization and a SHA-256 hash to ensure the payload can't be tampered with. Each event links to the previous one via a `chain_hash`, creating a tamper-evident, append-only log for every user.
 
-| Event Type | Description |
-|---|---|
-| `graph.delta` | Declares a need, resource, or skill (the core building block) |
-| `project.motion` | Proposes a community project or collective action |
-| `task.commit` | Accepts a task assignment within a project |
-| `task.done` | Marks a task as completed |
-| `capability.grant` | Delegates a scoped authorization token to another user |
-| `capability.revoke` | Revokes a previously granted capability token |
-| `vote.cast` | Casts a vote on a community motion |
-| `dispute.report` | Reports a violation or broken commitment |
-| `trust.attest` | Provides a social proof for another user's trustworthiness |
-
-The validator pipeline processes incoming events through seven sequential checks: schema validation, signature verification, payload hash integrity, temporal window (±5 minutes), replay prevention (TTL-bounded nonce cache), chain link integrity, and authorization policy. An event that fails any check is silently dropped and the sender's trust score is penalized.
+To prevent Sybil attacks (spamming the network with fake accounts) in a serverless environment, I've designed a multi-layered validator pipeline. It checks temporal windows (rejecting events older than 5 minutes to prevent replay attacks) and enforces a local trust-scoring system. High-impact actions require a minimum trust score, which is built up through social proofs (`trust.attest` events) from existing community members.
 
 ### B.2 Network Layer (libp2p)
 
-The network layer uses libp2p to create a fully serverless P2P mesh. The node factory configures TCP and WebSocket transports, mDNS for local peer discovery, Kademlia DHT for wide-area peer discovery, and GossipSub for topic-based message propagation. Community topics are namespaced as `commonsmesh/v1/{communityId}`, allowing geographically distinct communities to operate in isolated namespaces.
+The network layer is built on libp2p. I'm configuring the node factory to handle the messy reality of mobile networks: using TCP and WebSockets for transport, mDNS for discovering peers on the same local network, and GossipSub for broadcasting events.
 
-The incremental sync protocol is the most technically novel component of the network layer. When two nodes connect, they exchange Bloom filters representing their known event hashes. The requesting node identifies missing events from the difference and requests them in chunks. This approach minimizes bandwidth consumption—a critical constraint for users in areas with limited mobile data—while ensuring eventual consistency of the community graph.
+The hardest part of mobile P2P is state synchronization when devices go offline and come back online. I'm implementing an incremental sync protocol using Bloom filters. When two phones connect, they exchange tiny Bloom filters representing their known event hashes. They calculate the difference and only request the missing chunks. This keeps bandwidth usage extremely low, which is vital for users on prepaid data plans.
 
 ### B.3 Local Graph Database
 
-The local graph database is implemented using SQLite (via `better-sqlite3` on desktop and `expo-sqlite` on mobile). The schema stores events in an append-only `events` table and maintains a derived `graph_nodes` and `graph_edges` table that represents the current state of the community graph. A `nonces` table provides persistent replay protection that survives app restarts.
+All data is stored locally using SQLite (via `expo-sqlite` on the React Native side). The schema is simple but powerful. There's an append-only `events` table that stores the raw cryptographic envelopes. From that, the app derives `graph_nodes` and `graph_edges` tables, which represent the current state of the community (who needs what, who is working on what project). 
 
-The graph store supports queries for active needs, available resources, and user profiles, which feed directly into the LLM matching engine. All data is stored exclusively on the user's device; the network layer only propagates signed incremental events, never the full graph.
+This local graph is what the UI queries, and it's what feeds into the on-device AI. Because it's local, the app works perfectly fine offline; it just syncs the state changes the next time it finds a peer.
 
 ### B.4 On-Device LLM Integration
 
-The LLM integration layer uses `llama.rn` (a React Native binding for `llama.cpp`) to run GGUF-format models locally. The matching engine operates in two stages. In the first stage, a deterministic rule engine performs fast, exact matching (e.g., a user who needs "a ladder" and a user who has "a ladder available"). In the second stage, the LLM is invoked for semantic matching (e.g., a user who needs "help moving furniture" and a user who "has a van and free time on weekends") and for detecting aggregate patterns (e.g., five users who each need "a community garden plot" could collectively negotiate with a landowner).
+This is where my edge computing background really comes into play. I'm integrating `llama.cpp` into the React Native app using `llama.rn` to run GGUF-format models (like Qwen2.5 1B) locally.
 
-The LLM prompt is carefully structured to include a JSON summary of the local graph, a list of active needs and resources, and a request for actionable suggestions. The model is instructed to output structured JSON, which is then parsed and displayed as actionable "motions" in the app UI.
+The matching engine runs in two stages to save battery. The first stage is a deterministic, rule-based engine that looks for exact keyword matches in the local SQLite graph. If it finds a match, it stops there.
+
+The second stage only wakes up the LLM when the phone is idle or charging. It feeds the LLM a JSON summary of the unmatched needs and resources. The prompt asks the model to find semantic matches (e.g., realizing that someone offering "truck space" can help someone who needs "moving boxes") or to spot aggregate patterns (e.g., noticing that five people all need the same building material, and proposing a bulk purchase motion). The LLM outputs structured JSON, which the app turns into actionable UI elements.
 
 ---
 
 ## Part C: Milestone Plan
 
-The project is structured as a 9-month development cycle, divided into five milestones. Each milestone produces a publicly available, verifiable deliverable.
+I've structured this as a 9-month development cycle. I'm building this independently, and each milestone results in a concrete, open-source deliverable.
 
 | Milestone | Duration | Deliverables | Verification |
 |---|---|---|---|
-| **M1: Protocol Hardening** | Months 1–2 | Finalized event schema (JSON Schema), complete validator pipeline with anti-Sybil mechanisms, capability token system, test suite with ≥90% coverage | Published to GitHub; test results in CI |
-| **M2: Network Layer** | Months 3–4 | libp2p node factory, Bloom filter sync protocol, integration tests with 3+ simulated nodes | Published to GitHub; demo video |
-| **M3: LLM Integration** | Months 5–6 | `llama.rn` integration, two-stage matching engine, benchmark report (inference time, battery usage on mid-range Android device) | Published to GitHub; benchmark report |
-| **M4: Mobile App** | Months 7–8 | Complete React Native (Expo) app with all 9 screens, keychain key management, end-to-end test with 2 physical devices | Published to GitHub; demo video |
-| **M5: Pilot & Documentation** | Month 9 | Pilot deployment report (≥10 users), comprehensive technical documentation, user guide, security audit preparation checklist | Published to GitHub; pilot report |
+| **M1: Protocol & Security** | Months 1–2 | Finalized event schema, the validator pipeline (anti-Sybil, replay protection), and the capability token system. | Code pushed to GitHub; test suite passing. |
+| **M2: P2P Network Sync** | Months 3–4 | libp2p node setup for mobile, Bloom filter sync implementation. | Code pushed to GitHub; demo video showing two nodes syncing. |
+| **M3: Local AI Integration** | Months 5–6 | `llama.rn` integrated, two-stage matching engine built, prompts optimized for 1B models. | Code pushed to GitHub; benchmark report on inference time/battery usage. |
+| **M4: Mobile App Build** | Months 7–8 | React Native (Expo) app completed, UI wired to the local graph DB. | Code pushed to GitHub; end-to-end test video on physical Android/iOS devices. |
+| **M5: Pilot & Docs** | Month 9 | Run a pilot with a local mutual aid group, write the protocol specs, prep for security audit. | Pilot report and technical documentation published. |
 
 ---
 
 ## Part D: Sustainability and Long-Term Impact
 
-CommonsMesh is designed for long-term sustainability as a digital commons. The AGPL-3.0 license ensures that any commercial use of the codebase must contribute improvements back to the community. The local-first architecture means there are no server costs to sustain—users' own devices form the network.
+I'm releasing everything under the AGPL-3.0 license. This ensures the codebase remains a digital commons. If a commercial entity wants to use the protocol, they have to contribute their improvements back.
 
-After the initial grant period, sustainability will be pursued through three channels. First, the project will apply for follow-on NGI Zero funding to scale the protocol and add features such as offline mesh networking (Bluetooth/Wi-Fi Direct) and integration with community currencies. Second, the open protocol specification will be submitted to relevant standards bodies to encourage adoption by other community technology projects. Third, community-operated relay nodes (for users without persistent internet access) can be funded through voluntary contributions from the communities that benefit from the network.
+Because the architecture is local-first and serverless, there are no ongoing cloud hosting costs to worry about. The community sustains the network simply by running the app on their phones. 
 
-The most significant long-term impact of CommonsMesh is not the app itself, but the **open protocol for structured community coordination**. Just as ActivityPub became the foundation for the Fediverse, the CommonsMesh protocol can become a reusable building block for any application that needs to coordinate decentralized, privacy-preserving community action.
+In the long run, I want the CommonsMesh protocol to become a standard building block. Just like ActivityPub standardized federated social media, I hope this protocol can standardize decentralized community coordination. If other projects adopt the event schema, we could see interoperable mutual aid networks that don't rely on any single app or platform.
 
 ---
 
 ## Part E: Relation to Existing NGI Zero Projects
 
-CommonsMesh is complementary to several existing NGI Zero efforts. It builds on the libp2p ecosystem that has received NGI support, and its local-first data model is inspired by the Solid project's vision of user-owned data. Unlike Solid (which requires a personal data pod server), CommonsMesh is fully serverless. Unlike Secure Scuttlebutt (which is optimized for social feeds), CommonsMesh is optimized for structured, actionable coordination. CommonsMesh does not compete with federated social networks; it fills a distinct gap as a **coordination layer for real-world collective action**.
+I'm heavily leveraging the libp2p ecosystem, which has received NGI support in the past. While projects like Secure Scuttlebutt (which I admire) focus on federated social feeds, CommonsMesh is focused strictly on structured coordination and state changes. It fills a different niche: it's not for chatting; it's for getting things done.
 
-We are open to collaboration with any NGI Zero-funded projects working on decentralized identity, local-first data, or P2P networking, and welcome suggestions from the review team in this regard.
+I'm very open to collaborating with other NGI Zero grantees, especially anyone working on local-first data sync or decentralized identity, as those areas overlap heavily with what I'm building.
 
 ---
 
 ## Part F: Open Source Commitment
 
-All software produced under this grant will be released under the **AGPL-3.0-only** license. This includes:
+I commit to releasing all software, documentation, and protocol specifications produced under this grant under the **AGPL-3.0-only** license. 
 
-- The complete protocol specification and JSON Schema
-- The TypeScript implementation of the protocol engine, network layer, and database layer
-- The React Native mobile application
-- All documentation, including technical specifications, user guides, and the pilot deployment report
-- All benchmark data and test suites
+The repository is already public at: [https://github.com/e982happy/CommonsMesh](https://github.com/e982happy/CommonsMesh)
 
-The repository is publicly available at: [https://github.com/e982happy/CommonsMesh](https://github.com/e982happy/CommonsMesh)
-
-We commit to maintaining the repository as an active open-source project, responding to issues and pull requests, and publishing all grant-funded work incrementally as it is completed.
+I will maintain this repository, document the code thoroughly, and ensure that the work funded by NGI Zero is easily accessible and reusable by the broader open-source community.
