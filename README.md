@@ -1,124 +1,126 @@
 # CommonsMesh
 
-> **完全去中心化的社区互助网络** — 基于 libp2p、本地 LLM 和密码学验证的开源应用
+> **A Fully Decentralized Community Mutual Aid Network** — Open-source application powered by libp2p, on-device LLMs, and cryptographic verification.
 
-CommonsMesh 帮助世界各地的社群（无论是地理社区还是网络社群）实现高效的互助、资源匹配、社区动议和项目协作。它没有中央服务器，你的数据存储在你的设备上。
+[**[中文版 README (Chinese)]**](README.zh.md)
 
----
-
-## 核心理念
-
-用户在 app 中声明自己的**需求**和**能提供的资源**。这些信息以加密签名的增量消息形式，通过 libp2p 网络在社区节点间传播。每个 app 本地维护一个**社区图谱数据库**，内嵌的**轻量级 LLM（~1B 参数）**持续分析图谱，主动发现：
-
-- 需求 ↔ 资源的直接匹配（互助搬家、技能交换等）
-- 多人聚合需求（团购议价机会）
-- 互补技能组合（项目合作机会）
-- 社区活动和集体行动
-
-AI 主动提出**动议**，代替用户完成匹配、分工、任务分配和进度跟进。
+CommonsMesh helps communities worldwide (whether geographical or digital) achieve efficient mutual aid, resource matching, community motions, and project collaboration. It operates without any central servers—your data is stored exclusively on your own device.
 
 ---
 
-## Monorepo 结构
+## Core Philosophy
 
-```
+Users declare their **needs** and **available resources** within the app. This information is propagated across community nodes via the libp2p network in the form of cryptographically signed incremental messages. Every app maintains a **local community graph database** and embeds a **lightweight LLM (~1B parameters)** that continuously analyzes the graph to proactively discover:
+
+- Direct matches between needs and resources (e.g., moving assistance, skill exchange)
+- Aggregated multi-person needs (e.g., group purchasing and bargaining opportunities)
+- Complementary skill combinations (e.g., project collaboration opportunities)
+- Community events and collective actions
+
+The AI proactively proposes **motions**, assisting users with matching, role division, task assignment, and progress tracking.
+
+---
+
+## Monorepo Structure
+
+```text
 CommonsMesh/
-├── protocol/                    # 协议层（消息格式、验证引擎、密码学）
+├── protocol/                    # Protocol Layer (Message format, validation engine, cryptography)
 │   ├── src/
-│   │   ├── types.ts             # 完整类型定义
-│   │   ├── validator.ts         # 消息验证流水线（含防女巫、防重放）
-│   │   ├── engine.ts            # 状态转换引擎
-│   │   ├── capability.ts        # 能力令牌（授权系统）
-│   │   ├── crypto.ts            # Ed25519 签名 + SHA-256
-│   │   ├── canonical.ts         # 规范化 JSON（确定性序列化）
-│   │   ├── graph.ts             # 内存图谱操作
-│   │   └── state.ts             # 初始状态工厂
-│   ├── message-v1.schema.json   # JSON Schema（消息格式规范）
-│   ├── SYBIL-RESISTANCE.md      # 防女巫攻击设计文档
-│   ├── SYNC.md                  # 增量同步协议设计文档
+│   │   ├── types.ts             # Complete type definitions
+│   │   ├── validator.ts         # Message validation pipeline (Anti-Sybil, Anti-Replay)
+│   │   ├── engine.ts            # State transition engine
+│   │   ├── capability.ts        # Capability tokens (Authorization system)
+│   │   ├── crypto.ts            # Ed25519 signatures + SHA-256
+│   │   ├── canonical.ts         # Canonical JSON (Deterministic serialization)
+│   │   ├── graph.ts             # In-memory graph operations
+│   │   └── state.ts             # Initial state factory
+│   ├── message-v1.schema.json   # JSON Schema (Message format specification)
+│   ├── SYBIL-RESISTANCE.md      # Anti-Sybil attack design document
+│   ├── SYNC.md                  # Incremental sync protocol design document
 │   └── examples/
-│       └── demo-node.ts         # 协议层演示
+│       └── demo-node.ts         # Protocol layer demonstration
 │
 ├── packages/
-│   ├── network/                 # libp2p 网络层
+│   ├── network/                 # libp2p Network Layer
 │   │   └── src/
-│   │       ├── node.ts          # libp2p 节点工厂（TCP+WS+mDNS+DHT+GossipSub）
-│   │       ├── sync.ts          # 增量同步协议实现（Bloom filter）
-│   │       ├── types.ts         # 网络层类型和 Topic 命名规范
+│   │       ├── node.ts          # libp2p node factory (TCP+WS+mDNS+DHT+GossipSub)
+│   │       ├── sync.ts          # Incremental sync protocol implementation (Bloom filter)
+│   │       ├── types.ts         # Network layer types and Topic naming conventions
 │   │       └── index.ts
 │   │
-│   ├── db/                      # 本地图谱数据库层
+│   ├── db/                      # Local Graph Database Layer
 │   │   └── src/
-│   │       ├── db.ts            # SQLite 连接管理和迁移运行器
-│   │       ├── schema.ts        # 数据库 schema 类型
-│   │       ├── event-store.ts   # 事件日志持久化
-│   │       ├── graph-store.ts   # 图节点/边 CRUD + 查询
-│   │       ├── nonce-store.ts   # 持久化 nonce 缓存（防重放）
+│   │       ├── db.ts            # SQLite connection management and migration runner
+│   │       ├── schema.ts        # Database schema types
+│   │       ├── event-store.ts   # Event log persistence
+│   │       ├── graph-store.ts   # Graph node/edge CRUD + queries
+│   │       ├── nonce-store.ts   # Persistent nonce cache (Anti-Replay)
 │   │       ├── index.ts
 │   │       └── migrations/
 │   │           └── 001_initial.sql
 │   │
-│   └── llm/                     # 本地 LLM 集成层
+│   └── llm/                     # On-device LLM Integration Layer
 │       └── src/
-│           ├── llm-engine.ts    # LLM 引擎（llama.rn 或 OpenAI 兼容 API）
-│           ├── matcher.ts       # 社区图谱匹配引擎（规则 + LLM）
+│           ├── llm-engine.ts    # LLM engine (llama.rn or OpenAI-compatible API)
+│           ├── matcher.ts       # Community graph matching engine (Rules + LLM)
 │           └── index.ts
 │
 ├── apps/
-│   └── mobile/                  # React Native 移动端应用（Expo）
+│   └── mobile/                  # React Native Mobile App (Expo)
 │       └── src/
-│           ├── App.tsx          # 根组件
-│           ├── navigation/      # React Navigation 路由
-│           ├── screens/         # 所有页面
-│           │   ├── OnboardingScreen.tsx      # 新用户引导（密钥生成）
-│           │   ├── CommunityMapScreen.tsx    # 社区图谱主界面
-│           │   ├── NeedsResourcesScreen.tsx  # 需求/资源声明
-│           │   ├── ProjectsScreen.tsx        # 社区项目列表
-│           │   ├── ProjectDetailScreen.tsx   # 项目详情
-│           │   ├── TaskScreen.tsx            # 任务详情
-│           │   ├── MatchSuggestionsScreen.tsx # AI 匹配建议
-│           │   ├── ProfileScreen.tsx         # 用户档案
-│           │   └── DisputeScreen.tsx         # 争议处理
-│           ├── components/      # 公共组件（MatchCard, EventCard）
+│           ├── App.tsx          # Root component
+│           ├── navigation/      # React Navigation routing
+│           ├── screens/         # All screens
+│           │   ├── OnboardingScreen.tsx      # New user onboarding (Key generation)
+│           │   ├── CommunityMapScreen.tsx    # Community graph main interface
+│           │   ├── NeedsResourcesScreen.tsx  # Need/Resource declaration
+│           │   ├── ProjectsScreen.tsx        # Community projects list
+│           │   ├── ProjectDetailScreen.tsx   # Project details
+│           │   ├── TaskScreen.tsx            # Task details
+│           │   ├── MatchSuggestionsScreen.tsx # AI match suggestions
+│           │   ├── ProfileScreen.tsx         # User profile
+│           │   └── DisputeScreen.tsx         # Dispute handling
+│           ├── components/      # Shared components (MatchCard, EventCard)
 │           ├── hooks/           # useLLM hook
-│           ├── services/        # keychain 服务（密钥生成和签名）
-│           └── store/           # Zustand 状态管理
+│           ├── services/        # Keychain service (Key generation and signing)
+│           └── store/           # Zustand state management
 │
 ├── docs/
-│   └── ARCHITECTURE.md          # 系统架构文档
+│   └── ARCHITECTURE.md          # System architecture documentation
 │
-├── legacy-src/                  # 原始 src/ 目录（历史参考）
-├── tsconfig.base.json           # 共享 TypeScript 配置
-└── package.json                 # pnpm workspace 配置
+├── legacy-src/                  # Original src/ directory (Historical reference)
+├── tsconfig.base.json           # Shared TypeScript configuration
+└── package.json                 # pnpm workspace configuration
 ```
 
 ---
 
-## 安全设计
+## Security Design
 
-| 威胁 | 防护机制 |
-|------|----------|
-| **女巫攻击** | 信任分数阈值（高影响力操作需 score ≥ 0.1）+ 社会证明 + 硬件证明 |
-| **消息重放** | TTL 限定的 nonce 缓存（24h 自动过期）+ 时间窗口验证 |
-| **消息篡改** | Ed25519 签名 + 规范化 JSON 的 SHA-256 payload hash |
-| **链分叉** | 严格线性 chain_hash 链（只接受 prev_event_hash = 上一事件的 chain_hash）|
-| **时钟攻击** | 消息 created_at 必须在本地时钟 ±5 分钟内 |
-| **能力滥用** | 能力令牌 max_count 执行 + 即时撤销（revokedCapabilities set）|
-| **投票双花** | 选举 nullifier 集合（每个 nullifier 只能使用一次）|
+| Threat | Defense Mechanism |
+|--------|-------------------|
+| **Sybil Attacks** | Trust score thresholds (high-impact actions require score ≥ 0.1) + Social proofs + Hardware attestation |
+| **Message Replay** | TTL-bounded nonce cache (24h automatic expiration) + Time window validation |
+| **Message Tampering** | Ed25519 signatures + SHA-256 payload hash of canonical JSON |
+| **Chain Forking** | Strict linear `chain_hash` chain (only accepts `prev_event_hash` = previous event's `chain_hash`) |
+| **Clock Attacks** | Message `created_at` must be within ±5 minutes of local clock |
+| **Capability Abuse** | Capability token `max_count` enforcement + Instant revocation (`revokedCapabilities` set) |
+| **Vote Double-Spending**| Election nullifier sets (each nullifier can only be used once) |
 
-详见 [`protocol/SYBIL-RESISTANCE.md`](protocol/SYBIL-RESISTANCE.md)。
+For more details, see [`protocol/SYBIL-RESISTANCE.md`](protocol/SYBIL-RESISTANCE.md).
 
 ---
 
-## 快速开始
+## Quick Start
 
-### 环境要求
+### Prerequisites
 
 - Node.js ≥ 20
 - pnpm ≥ 9
-- React Native 开发环境（Expo CLI）
+- React Native development environment (Expo CLI)
 
-### 安装
+### Installation
 
 ```bash
 git clone https://github.com/e982happy/CommonsMesh.git
@@ -126,20 +128,20 @@ cd CommonsMesh
 pnpm install
 ```
 
-### 构建协议层
+### Build Protocol Layer
 
 ```bash
 pnpm build
 ```
 
-### 运行移动端
+### Run Mobile App
 
 ```bash
 cd apps/mobile
 pnpm start
 ```
 
-### 运行协议层演示
+### Run Protocol Layer Demo
 
 ```bash
 cd protocol
@@ -149,32 +151,32 @@ node dist/examples/demo-node.js
 
 ---
 
-## 推荐的本地 LLM 模型
+## Recommended On-device LLM Models
 
-| 模型 | 大小 | 质量 | 备注 |
-|------|------|------|------|
-| Qwen2.5-1.5B-Instruct-Q4_K_M | ~1.0 GB | ★★★★ | 推荐首选，中文优秀 |
-| SmolLM2-1.7B-Instruct-Q4_K_M | ~1.1 GB | ★★★☆ | 英文为主 |
-| Phi-3.5-mini-instruct-Q4_K_M | ~2.2 GB | ★★★★★ | 质量最高，需要更多内存 |
+| Model | Size | Quality | Notes |
+|-------|------|---------|-------|
+| Qwen2.5-1.5B-Instruct-Q4_K_M | ~1.0 GB | ★★★★ | Recommended default, excellent multilingual support |
+| SmolLM2-1.7B-Instruct-Q4_K_M | ~1.1 GB | ★★★☆ | English-focused |
+| Phi-3.5-mini-instruct-Q4_K_M | ~2.2 GB | ★★★★★ | Highest quality, requires more memory |
 
-模型文件（GGUF 格式）应放置于：
+Model files (GGUF format) should be placed in:
 - iOS: `Documents/models/`
 - Android: `files/models/`
 
 ---
 
-## 贡献
+## Contributing
 
-请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+Please read [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## 安全漏洞
+## Security Vulnerabilities
 
-请阅读 [SECURITY.md](SECURITY.md)。
+Please read [SECURITY.md](SECURITY.md).
 
-## 路线图
+## Roadmap
 
-请阅读 [ROADMAP.md](ROADMAP.md)。
+Please read [ROADMAP.md](ROADMAP.md).
 
-## 许可证
+## License
 
-[AGPL-3.0-only](LICENSE) — 使用本项目的任何修改版本必须以相同许可证开源。
+[AGPL-3.0-only](LICENSE) — Any modified versions of this project must be open-sourced under the same license.
