@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://commonsmesh.example/protocol/message-v1.schema.json",
+  "title": "CommonsMesh Message V1",
+  "type": "object",
+  "required": [
+    "msg_id",
+    "protocol_version",
+    "kind",
+    "created_at",
+    "sender",
+    "attestation",
+    "authz",
+    "integrity",
+    "payload"
+  ],
+  "properties": {
+    "msg_id": { "type": "string", "minLength": 8 },
+    "protocol_version": { "const": "1.0" },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "graph.delta",
+        "project.motion",
+        "project.intent",
+        "project.update",
+        "task.propose",
+        "task.assign",
+        "task.commit",
+        "task.deliver",
+        "election.motion",
+        "election.vote",
+        "capability.grant",
+        "capability.revoke",
+        "dispute.report",
+        "dispute.response",
+        "ack",
+        "sync.request",
+        "sync.snapshot"
+      ]
+    },
+    "created_at": { "type": "integer" },
+    "sender": {
+      "type": "object",
+      "required": ["user_id", "device_id", "agent_id", "app_id", "user_pubkey", "device_pubkey", "agent_pubkey"],
+      "properties": {
+        "user_id": { "type": "string" },
+        "device_id": { "type": "string" },
+        "agent_id": { "type": "string" },
+        "app_id": { "type": "string" },
+        "user_pubkey": { "type": "string" },
+        "device_pubkey": { "type": "string" },
+        "agent_pubkey": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "attestation": {
+      "type": "object",
+      "required": ["app_build_hash", "manifest_hash", "attestation_type", "attestation_proof"],
+      "properties": {
+        "app_build_hash": { "type": "string" },
+        "manifest_hash": { "type": "string" },
+        "attestation_type": {
+          "type": "string",
+          "enum": ["none", "software", "hardware", "social", "quorum"]
+        },
+        "attestation_proof": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "authz": {
+      "type": "object",
+      "required": ["capability_token", "scope", "valid_from", "valid_to", "nonce", "prev_event_hash"],
+      "properties": {
+        "capability_token": { "type": "object" },
+        "scope": {
+          "type": "object",
+          "required": ["visibility", "target_mode", "target_ref"],
+          "properties": {
+            "visibility": { "type": "string", "enum": ["public", "topic", "project", "direct", "private"] },
+            "target_mode": { "type": "string", "enum": ["broadcast", "topic", "peer", "group", "selector"] },
+            "target_ref": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "valid_from": { "type": "integer" },
+        "valid_to": { "type": "integer" },
+        "nonce": { "type": "string" },
+        "prev_event_hash": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["payload_hash", "signature", "chain_hash"],
+      "properties": {
+        "payload_hash": { "type": "string" },
+        "signature": { "type": "string" },
+        "chain_hash": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "payload": { "type": "object" }
+  },
+  "additionalProperties": false
+}
