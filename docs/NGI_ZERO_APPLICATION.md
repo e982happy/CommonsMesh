@@ -10,13 +10,13 @@
 
 **Can you explain the whole project and its expected outcome(s)?** *(Max 1200 characters)*
 
-I'm building CommonsMesh, a local-first mobile app designed for grassroots mutual aid and community organizing. It operates entirely without central servers.
+CommonsMesh is a local-first mobile application developed for grassroots mutual aid and community organizing, operating entirely without central servers.
 
-Right now, community groups rely on WhatsApp or Facebook. Needs get lost in chat history, and privacy is non-existent. CommonsMesh changes this by running a peer-to-peer network (libp2p) directly between phones. When someone needs a tool, offers a skill, or proposes a community project, the app broadcasts it as a cryptographically signed event. 
+Currently, community groups rely heavily on platforms like WhatsApp or Facebook. Critical needs get lost in chat histories, and privacy is non-existent. CommonsMesh addresses this by establishing a peer-to-peer network (libp2p) directly between mobile devices. When a participant requires a tool, offers a skill, or proposes a community project, the application broadcasts this as a cryptographically signed event. 
 
-Instead of a noisy chat feed, the app builds a local "community graph" database on each device. I'm embedding a small, efficient LLM (like Qwen2.5 1B) directly into the app to run locally. This AI constantly reads the local graph to spot matching needs, suggest group purchases, or help divide tasks for community projects—without any data ever leaving the user's phone.
+Instead of generating a noisy chat feed, the system constructs a local "community graph" database on each device. A small, efficient LLM (such as Qwen2.5 1B) is embedded directly into the application to run locally. This AI continuously analyzes the local graph to identify matching needs, suggest group purchases, or assist in dividing tasks for community projects—ensuring no data ever leaves the user's phone.
 
-The outcome will be a production-ready mobile app and a reusable P2P protocol stack. It gives marginalized and resource-constrained communities a secure, private, and highly efficient way to coordinate real-world action, turning their collective needs into structured, actionable steps.
+The expected outcome is a production-ready mobile application and a reusable P2P protocol stack. It provides marginalized and resource-constrained communities with a secure, private, and highly efficient method to coordinate real-world action, transforming collective needs into structured, actionable steps.
 
 ---
 
@@ -24,15 +24,15 @@ The outcome will be a production-ready mobile app and a reusable P2P protocol st
 
 **Have you been involved with projects or organisations relevant to this project before?** *(Max 2500 characters)*
 
-My background is a mix of software engineering and architectural field research, which gives me a unique perspective on community infrastructure. 
+The applicant's background combines software engineering with architectural field research, providing a unique perspective on community infrastructure. 
 
-For the past five years, I've worked as a software developer at a smart glasses company. This role forced me to become highly proficient in writing efficient, resource-constrained code that runs on edge devices. I know how to optimize software for hardware with limited battery and processing power, which is exactly the skill set needed to run local LLMs and P2P sync protocols on mobile phones.
+For the past five years, the applicant has worked as a software developer at a smart glasses company. This role required developing highly proficient skills in writing efficient, resource-constrained code that runs on edge devices. Optimizing software for hardware with limited battery and processing power is the exact skill set required to successfully run local LLMs and P2P sync protocols on mobile phones.
 
-Before moving into tech, my undergraduate and graduate studies were in architecture. During that time, I spent months doing intensive field research in marginalized communities, both domestically and internationally. The most formative experience was my work in Port Moresby, Papua New Guinea, where I helped design affordable housing and engaged directly with informal settlement communities. 
+Prior to entering the technology sector, the applicant's undergraduate and graduate studies focused on architecture. During that period, months were spent conducting intensive field research in marginalized communities, both domestically and internationally. A particularly formative experience involved working in Port Moresby, Papua New Guinea, assisting in the design of affordable housing and engaging directly with informal settlement communities. 
 
-Spending time in these settlements taught me how people actually survive on the margins: through dense, informal networks of mutual aid and shared resources. They don't need another social network; they need tools that respect their limited resources (like intermittent internet access) and help them coordinate the sharing of physical goods, labor, and collective bargaining power. 
+Spending time in these settlements revealed how people survive on the margins: through dense, informal networks of mutual aid and shared resources. These communities do not need another social network; they require tools that respect their limited resources (such as intermittent internet access) and facilitate the coordination of physical goods, labor, and collective bargaining power. 
 
-I don't have a long history in cryptographic protocol design, but my edge computing experience combined with my deep, firsthand understanding of what underserved communities actually need to self-organize is why I'm building CommonsMesh. I'm applying my technical skills to solve the coordination bottlenecks I saw firsthand in Port Moresby and other communities.
+While the applicant's background may not include a long history in cryptographic protocol design, the combination of edge computing experience and a deep, firsthand understanding of what underserved communities require to self-organize is the driving force behind CommonsMesh. Technical skills are being applied to resolve the coordination bottlenecks observed firsthand in Port Moresby and other communities.
 
 ---
 
@@ -40,17 +40,17 @@ I don't have a long history in cryptographic protocol design, but my edge comput
 
 **Compare your own project with existing or historical efforts. E.g. what is new, more thorough or otherwise different.** *(Max 4000 characters)*
 
-If you look at how communities organize today, they almost exclusively use centralized platforms like WhatsApp, Discord, or Facebook Groups. These are great for talking, but terrible for coordinating. A request for help gets buried under fifty other messages. The burden of matching people who have resources with people who need them falls entirely on exhausted community organizers. Plus, these communities are surrendering all their social graph data to tech giants.
+An examination of how communities organize today reveals an almost exclusive reliance on centralized platforms like WhatsApp, Discord, or Facebook Groups. These tools are excellent for conversation but highly ineffective for coordination. A request for assistance easily gets buried under numerous other messages. The burden of matching individuals who possess resources with those who need them falls entirely on exhausted community organizers. Furthermore, these communities are surrendering their social graph data to technology corporations.
 
-There are decentralized alternatives like Mastodon or Secure Scuttlebutt. But they just replicate the "social feed" model in a federated way. They are still optimized for broadcasting thoughts, not organizing labor or sharing resources.
+Decentralized alternatives such as Mastodon or Secure Scuttlebutt exist, but they largely replicate the "social feed" model in a federated manner. They remain optimized for broadcasting thoughts rather than organizing labor or sharing resources.
 
-CommonsMesh takes a completely different approach. 
+CommonsMesh adopts a fundamentally different approach. 
 
-First, we don't treat communication as text messages. We treat it as state changes. When a user interacts with the app, they are publishing structured intents—like `graph.delta` (I need a ladder) or `project.motion` (Let's clean up the park). This builds a queryable database of community capacity, not a timeline of chatter.
+First, communication is not treated as text messages, but as state changes. When a user interacts with the application, they publish structured intents—such as `graph.delta` (indicating a need for a ladder) or `project.motion` (proposing a park cleanup). This approach builds a queryable database of community capacity, rather than a timeline of chatter.
 
-Second, the app does the heavy lifting of coordination. By running a lightweight LLM locally on the phone, the app can look at the community graph and say, "Hey, three of your neighbors need the same building materials, you should bulk order," or "You need moving boxes and your neighbor just finished moving." It acts as an automated, privacy-respecting community organizer.
+Second, the application assumes the heavy lifting of coordination. By running a lightweight LLM locally on the device, the system can analyze the community graph and proactively suggest actions. For instance, it might identify that three neighbors require the same building materials and recommend a bulk order, or notice that one user needs moving boxes while another recently finished moving. It functions as an automated, privacy-respecting community organizer.
 
-Finally, it works in the reality of marginalized communities. It doesn't assume you have a fast, always-on internet connection or a server you can rent. It syncs directly phone-to-phone over libp2p when connections are available. It's built for resilience in places where infrastructure is unreliable.
+Finally, the system is designed for the reality of marginalized communities. It does not assume access to a fast, always-on internet connection or the ability to rent a server. It synchronizes directly phone-to-phone over libp2p when connections are available, ensuring resilience in areas where infrastructure is unreliable.
 
 ---
 
@@ -58,19 +58,19 @@ Finally, it works in the reality of marginalized communities. It doesn't assume 
 
 **What are significant technical challenges you expect to solve during the project?** *(Max 5000 characters)*
 
-Building this requires solving a few hard problems, mostly around making edge computing and P2P networks play nicely together on mobile devices.
+Developing this system requires solving several complex problems, primarily concerning the integration of edge computing and P2P networks on mobile devices.
 
 1. **Running LLMs on Mobile Devices:** 
-   Getting a 1B parameter model to run on a mid-range Android phone without draining the battery or freezing the UI is tough. I'm integrating `llama.cpp` via React Native (`llama.rn`). The challenge isn't just getting it to run; it's writing the right prompts so a small model can accurately extract matching patterns from JSON graph data. I'll need to heavily optimize the inference pipeline so it only runs when the phone is idle or plugged in.
+   Executing a 1B parameter model on a mid-range Android phone without draining the battery or freezing the UI is a significant challenge. The integration of `llama.cpp` via React Native (`llama.rn`) is planned. The difficulty lies not merely in execution, but in crafting the appropriate prompts so a small model can accurately extract matching patterns from JSON graph data. The inference pipeline must be heavily optimized to run only when the phone is idle or plugged in.
 
 2. **Efficient State Sync over P2P:** 
-   Phones go offline constantly. When two nodes finally connect, they need to figure out what events they are missing without transferring the whole database. I'm building a sync protocol over libp2p using Bloom filters. The technical hurdle is tuning the filter size so we minimize bandwidth (targeting under 50 KB/day per user) while still guaranteeing that the cryptographically linked event log eventually reaches consistency across the neighborhood.
+   Mobile devices frequently go offline. When two nodes finally connect, they must determine missing events without transferring the entire database. A sync protocol over libp2p using Bloom filters is being developed. The technical hurdle involves tuning the filter size to minimize bandwidth (targeting under 50 KB/day per user) while still guaranteeing that the cryptographically linked event log eventually achieves consistency across the neighborhood.
 
 3. **Preventing Abuse Without Central Servers:** 
-   Because there's no central server to ban bad actors, preventing Sybil attacks (someone spinning up a thousand fake accounts to spam the network) is a major issue. I'm approaching this pragmatically. Instead of heavy blockchain consensus, I'm using a mix of device-level hardware attestation (proving it's a real phone) and a local web-of-trust scoring system. If an account starts spamming, their local trust score drops, and other nodes simply drop their packets. Getting this logic right so it protects the network without locking out legitimate new users is a delicate balancing act.
+   In the absence of a central server to ban malicious actors, preventing Sybil attacks (where numerous fake accounts are created to spam the network) is a critical issue. A pragmatic approach is being taken. Instead of relying on heavy blockchain consensus, a combination of device-level hardware attestation (proving the device is real) and a local web-of-trust scoring system is utilized. If an account begins spamming, its local trust score decreases, and other nodes will simply drop its packets. Implementing this logic to protect the network without excluding legitimate new users requires careful balancing.
 
 4. **Handling Concurrent Edits in a Graph:** 
-   If two people accept the same community task while offline, the network has to resolve that conflict gracefully when they reconnect. I'm implementing a CRDT (Conflict-Free Replicated Data Type) approach adapted for our signed event envelopes, ensuring the UI reflects the reality of the community state without breaking the cryptographic chain of events.
+   If two individuals accept the same community task while offline, the network must resolve that conflict gracefully upon reconnection. A CRDT (Conflict-Free Replicated Data Type) approach adapted for signed event envelopes is being implemented. This ensures the UI reflects the reality of the community state without compromising the cryptographic chain of events.
 
 ---
 
@@ -78,15 +78,15 @@ Building this requires solving a few hard problems, mostly around making edge co
 
 **Describe the ecosystem of the project, and how you will engage with relevant actors and promote the outcomes?** *(Max 2500 characters)*
 
-The ecosystem around CommonsMesh involves grassroots organizers, the local-first software community, and open-source AI developers.
+The ecosystem surrounding CommonsMesh includes grassroots organizers, the local-first software community, and open-source AI developers.
 
-To make sure this actually works for people on the ground, I'm not developing it in a vacuum. I plan to partner with local mutual aid networks and housing cooperatives to run pilot deployments. My background in community research taught me that if you don't test with the actual end-users early on, you build the wrong thing. Their feedback will directly shape the UI and the AI matching logic.
+To ensure the system functions effectively for individuals on the ground, development will not occur in isolation. Partnerships with local mutual aid networks and housing cooperatives are planned to run pilot deployments. Background experience in community research has demonstrated that failing to test with actual end-users early in the process leads to building the wrong solution. Their feedback will directly shape the UI and the AI matching logic.
 
-Technically, I'm leaning heavily on the libp2p ecosystem. I intend to contribute my findings back to that community, particularly around mobile P2P networking and efficient Bloom filter syncing, which are known pain points in the space. 
+Technically, the project relies heavily on the libp2p ecosystem. Findings will be contributed back to that community, particularly concerning mobile P2P networking and efficient Bloom filter syncing, which are recognized challenges in the field. 
 
-I'll also engage with the open-source AI community (like the Hugging Face and llama.cpp ecosystems). Proving that you can use local, small-parameter models for concrete social good—rather than just chatbots—is a compelling use case that I think will attract contributors.
+Engagement with the open-source AI community (such as the Hugging Face and llama.cpp ecosystems) is also planned. Demonstrating that local, small-parameter models can be utilized for concrete social good—rather than merely as chatbots—provides a compelling use case likely to attract contributors.
 
-Everything I build will be open-sourced under AGPL-3.0. I'll document the protocol specifications clearly so other developers can build compatible clients or relay nodes, helping to grow this into a true piece of digital commons infrastructure.
+All developments will be open-sourced under the AGPL-3.0 license. Protocol specifications will be clearly documented to allow other developers to build compatible clients or relay nodes, facilitating the growth of this system into a true piece of digital commons infrastructure.
 
 ---
 
@@ -94,7 +94,7 @@ Everything I build will be open-sourced under AGPL-3.0. I'll document the protoc
 
 **Explain what the requested budget will be used for. A breakdown in the main tasks with associated effort is appreciated. Make rates explicit.** *(Max 2500 characters)*
 
-I am requesting €45,000 to fund the research, development, and pilot deployment of CommonsMesh over a 9-month period. I am working on this independently and currently have no other funding sources.
+A budget of €45,000 is requested to fund the research, development, and pilot deployment of CommonsMesh over a 9-month period. The project is being developed independently and currently has no other funding sources.
 
 **Task Breakdown:**
 
@@ -126,4 +126,4 @@ I am requesting €45,000 to fund the research, development, and pilot deploymen
 
 **Total: €45,000**
 
-The funding will allow me to dedicate my full technical expertise to solving the coordination problems I've seen in marginalized communities, delivering a fully open-source, public-good tool.
+The funding will allow for the dedication of full technical expertise to solving the coordination problems observed in marginalized communities, delivering a fully open-source, public-good tool.
