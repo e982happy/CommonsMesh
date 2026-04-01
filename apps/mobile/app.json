@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "CommonsMesh",
+    "slug": "commonsmesh",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "org.commonsmesh.mobile",
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "CommonsMesh 使用本地网络发现附近的社区节点。",
+        "NSBonjourServices": ["_commonsmesh._tcp"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0f172a"
+      },
+      "package": "org.commonsmesh.mobile",
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "ACCESS_WIFI_STATE",
+        "CHANGE_WIFI_MULTICAST_STATE"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "react-native-keychain",
+        {
+          "faceIDPermission": "CommonsMesh 使用 Face ID 保护你的密钥。"
+        }
+      ]
+    ],
+    "scheme": "commonsmesh",
+    "extra": {
+      "eas": {
+        "projectId": "commonsmesh-mobile"
+      }
+    }
+  }
+}

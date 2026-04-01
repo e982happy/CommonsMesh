@@ -1,0 +1,12 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@commonsmesh/protocol": ["../../protocol/src/index.ts"],
+      "@commonsmesh/llm": ["../../packages/llm/src/index.ts"],
+      "@commonsmesh/network": ["../../packages/network/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

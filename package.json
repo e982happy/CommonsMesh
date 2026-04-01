@@ -2,17 +2,25 @@
   "name": "commonsmesh",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "description": "Local-first community mutual aid and resource matching infrastructure",
-  "license": "MIT",
+  "description": "CommonsMesh — decentralized community mutual aid network (monorepo)",
+  "license": "AGPL-3.0-only",
+  "workspaces": [
+    "protocol",
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "demo": "node --enable-source-maps dist/examples/demo-node.js",
-    "check": "npm run build",
-    "clean": "rm -rf dist"
+    "build": "pnpm -r --filter './protocol' build && pnpm -r --filter './packages/*' build",
+    "clean": "pnpm -r clean",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
-    "typescript": "^5.9.0"
-  }
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
 }
