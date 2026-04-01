@@ -1,7 +1,7 @@
 # CommonsMesh
 
 > **A Fully Decentralized Community Mutual Aid Network** — Open-source application powered by libp2p, on-device LLMs, and cryptographic verification.
-
+> The project is still underdevelopment. 
 [**[中文版 README (Chinese)]**](README.zh.md)
 
 CommonsMesh helps communities worldwide (whether geographical or digital) achieve efficient mutual aid, resource matching, community motions, and project collaboration. It operates without any central servers—your data is stored exclusively on your own device.
@@ -112,42 +112,6 @@ For more details, see [`protocol/SYBIL-RESISTANCE.md`](protocol/SYBIL-RESISTANCE
 
 ---
 
-## Quick Start
-
-### Prerequisites
-
-- Node.js ≥ 20
-- pnpm ≥ 9
-- React Native development environment (Expo CLI)
-
-### Installation
-
-```bash
-git clone https://github.com/e982happy/CommonsMesh.git
-cd CommonsMesh
-pnpm install
-```
-
-### Build Protocol Layer
-
-```bash
-pnpm build
-```
-
-### Run Mobile App
-
-```bash
-cd apps/mobile
-pnpm start
-```
-
-### Run Protocol Layer Demo
-
-```bash
-cd protocol
-pnpm build
-node dist/examples/demo-node.js
-```
 
 ---
 
