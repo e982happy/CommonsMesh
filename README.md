@@ -95,14 +95,6 @@ That makes the system useful for mutual aid and small-scale self-organization wi
 
 ---
 
-## Quick start
-
-```bash
-npm install
-npm run build
-npm run demo
-```
-
 ---
 
 ## Core protocol concepts
@@ -174,4 +166,4 @@ See `SECURITY.md` for the current threat model and missing hardening work.
 
 ## License
 
-MIT. See `LICENSE`.
+GNU Affero General Public License v3.
